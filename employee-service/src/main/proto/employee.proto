@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+package io.github.alexshamrai.grpc;
+
+service EmployeeService {
+  rpc GetAllEmployees (google.protobuf.Empty) returns (GetAllEmployeesResponse) {}
+  rpc AddEmployee (AddEmployeeRequest) returns (AddEmployeeResponse) {}
+  rpc GetEmployee (GetEmployeeRequest) returns (GetEmployeeResponse) {}
+  rpc GetEmployeesByHiringYear (GetEmployeesByHiringYearRequest) returns (GetEmployeesByHiringYearResponse) {}
+  rpc GetDepartments (google.protobuf.Empty) returns (GetDepartmentsResponse) {}
+}
+
+message GetEmployeesByHiringYearRequest {
+  int32 hiring_year = 1;
+}
+
+message GetEmployeesByHiringYearResponse {
+  repeated Employee employees = 1;
+}
+
+message GetDepartmentsResponse {
+  repeated Department departments = 1;
+}
+
+message Department {
+  string department_name = 1;
+}
+
+message GetAllEmployeesResponse {
+  repeated Employee employees = 1;
+}
+
+message GetEmployeeRequest {
+  int32 employee_id = 1;
+}
+
+message GetEmployeeResponse {
+  Employee employee = 1;
+}
+
+message AddEmployeeRequest {
+  string name = 1;
+  int32 age = 2;
+  string department = 3;
+  string position = 4;
+  int32 hiring_year = 5;
+  double salary = 6;
+}
+
+message AddEmployeeResponse {
+  int32 employee_id = 1;
+}
+
+message Employee {
+  int32 id = 1;
+  string name = 2;
+  int32 age = 3;
+  string department = 4;
+  string position = 5;
+  int32 hiring_year = 6;
+  double salary = 7;
+}
