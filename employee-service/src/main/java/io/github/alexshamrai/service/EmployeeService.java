@@ -6,13 +6,13 @@ import io.github.alexshamrai.data.EmployeeRepository;
 import io.github.alexshamrai.grpc.AddEmployeeRequest;
 import io.github.alexshamrai.grpc.AddEmployeeResponse;
 import io.github.alexshamrai.grpc.Department;
+import io.github.alexshamrai.grpc.EmployeeFilterRequest;
+import io.github.alexshamrai.grpc.EmployeeListResponse;
 import io.github.alexshamrai.grpc.EmployeeServiceGrpc;
 import io.github.alexshamrai.grpc.GetAllEmployeesResponse;
 import io.github.alexshamrai.grpc.GetDepartmentsResponse;
 import io.github.alexshamrai.grpc.GetEmployeeRequest;
 import io.github.alexshamrai.grpc.GetEmployeeResponse;
-import io.github.alexshamrai.grpc.GetEmployeesByHiringYearRequest;
-import io.github.alexshamrai.grpc.GetEmployeesByHiringYearResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -109,16 +109,42 @@ public class EmployeeService extends EmployeeServiceGrpc.EmployeeServiceImplBase
     }
 
     @Override
-    public void getEmployeesByHiringYear(GetEmployeesByHiringYearRequest request,
-                                         StreamObserver<GetEmployeesByHiringYearResponse> responseObserver) {
-        if (request.getHiringYear() < 1900 || request.getHiringYear() > 2100) {
-            responseObserver.onError(Status.INVALID_ARGUMENT
-                .withDescription("Hiring year must be between 1900 and 2100")
-                .asRuntimeException());
-            return;
-        }
+    public void filterEmployees(EmployeeFilterRequest request, StreamObserver<EmployeeListResponse> responseObserver) {
+        List<Employee> filteredEmployees = employeeRepository.getAllEmployees().stream()
+            .filter(employee -> {
+                if (request.hasHiringYear() && employee.getHiringYear() != request.getHiringYear()) {
+                    return false;
+                }
 
-        List<io.github.alexshamrai.grpc.Employee> employees = employeeRepository.findByHiringYear(request.getHiringYear()).stream()
+                if (request.hasDepartment() && !employee.getDepartment().equals(request.getDepartment())) {
+                    return false;
+                }
+
+                if (request.hasMinAge() && employee.getAge() < request.getMinAge()) {
+                    return false;
+                }
+
+                if (request.hasMaxAge() && employee.getAge() > request.getMaxAge()) {
+                    return false;
+                }
+
+                if (request.hasPosition() && !employee.getPosition().equals(request.getPosition())) {
+                    return false;
+                }
+
+                if (request.hasMinSalary() && employee.getSalary() < request.getMinSalary()) {
+                    return false;
+                }
+
+                if (request.hasMaxSalary() && employee.getSalary() > request.getMaxSalary()) {
+                    return false;
+                }
+
+                return true;
+            })
+            .toList();
+
+        List<io.github.alexshamrai.grpc.Employee> grpcEmployees = filteredEmployees.stream()
             .map(employee -> io.github.alexshamrai.grpc.Employee.newBuilder()
                 .setId(employee.getId())
                 .setName(employee.getName())
@@ -130,8 +156,8 @@ public class EmployeeService extends EmployeeServiceGrpc.EmployeeServiceImplBase
                 .build())
             .toList();
 
-        GetEmployeesByHiringYearResponse response = GetEmployeesByHiringYearResponse.newBuilder()
-            .addAllEmployees(employees)
+        EmployeeListResponse response = EmployeeListResponse.newBuilder()
+            .addAllEmployees(grpcEmployees)
             .build();
 
         responseObserver.onNext(response);
