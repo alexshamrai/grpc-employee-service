@@ -9,15 +9,21 @@ service EmployeeService {
   rpc GetAllEmployees (google.protobuf.Empty) returns (GetAllEmployeesResponse) {}
   rpc AddEmployee (AddEmployeeRequest) returns (AddEmployeeResponse) {}
   rpc GetEmployee (GetEmployeeRequest) returns (GetEmployeeResponse) {}
-  rpc GetEmployeesByHiringYear (GetEmployeesByHiringYearRequest) returns (GetEmployeesByHiringYearResponse) {}
+  rpc FilterEmployees (EmployeeFilterRequest) returns (EmployeeListResponse) {}
   rpc GetDepartments (google.protobuf.Empty) returns (GetDepartmentsResponse) {}
 }
 
-message GetEmployeesByHiringYearRequest {
-  int32 hiring_year = 1;
+message EmployeeFilterRequest {
+  optional int32 hiring_year = 1;
+  optional string department = 2;
+  optional int32 min_age = 3;
+  optional int32 max_age = 4;
+  optional string position = 5;
+  optional double min_salary = 6;
+  optional double max_salary = 7;
 }
 
-message GetEmployeesByHiringYearResponse {
+message EmployeeListResponse {
   repeated Employee employees = 1;
 }
 
