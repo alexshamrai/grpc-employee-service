@@ -1,3 +1,4 @@
 rootProject.name = 'grpc-employee-service'
 include 'employee-service'
+include 'e2e-tests'
 
