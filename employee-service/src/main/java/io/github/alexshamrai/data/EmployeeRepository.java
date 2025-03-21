@@ -17,7 +17,7 @@ public class EmployeeRepository {
     private final Random random = new Random();
 
     static {
-        departments.add("Engineering");
+        departments.add("IT");
         departments.add("HR");
         departments.add("Marketing");
         departments.add("Finance");
@@ -26,7 +26,7 @@ public class EmployeeRepository {
             .id(1)
             .name("John Doe")
             .age(28)
-            .department("Engineering")
+            .department("IT")
             .position("Software Engineer")
             .hiringYear(2021)
             .salary(70000.0)
@@ -105,15 +105,4 @@ public class EmployeeRepository {
         return employees.stream().filter(employee -> employee.getId() == id).findFirst();
     }
 
-    /**
-     * Retrieves employees hired in a specific hiring year.
-     *
-     * @param hiringYear The year to filter employees by.
-     * @return List of employees hired in the given year.
-     */
-    public List<Employee> findByHiringYear(int hiringYear) {
-        return employees.stream()
-            .filter(employee -> employee.getHiringYear() == hiringYear)
-            .toList();
-    }
 }
